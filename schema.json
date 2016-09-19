@@ -1,0 +1,88 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema",
+  "definitions": {
+    "multistatus": {
+      "description": "Contains multiple response messages",
+      "properties": {
+        "response": {
+          "type": "array",
+          "items": {
+            "$ref": "response"
+          },
+          "minItems": 1
+        },
+        "responsedescription": {
+          "$ref": "responsedescription"
+        }
+      },
+      "required": ["response"]
+    },
+    "response": {
+      "description": "Holds a single response describing the effect of a method on resource and/or its properties",
+      "properties": {
+        "href": {
+          "type": "array",
+          "items": {
+            "$ref": "href"
+          },
+          "minItems": 1
+        }
+      },
+      "oneOf": [
+        {
+          "properties": {
+            "href": {
+              "type": "array",
+              "items": {
+                "$ref": "href"
+              },
+              "minItems": 1
+            },
+            "status": {
+              "$ref": "status"
+            }
+          },
+          "required": ["href", "status"]
+        },
+        {
+          "properties": {
+            "href": {
+              "$ref": "href"
+            },
+            "propstat": {
+              "type": "array",
+              "items": {
+                "$ref": "propstat"
+              },
+              "minItems": 1
+            }
+          },
+          "required": ["href", "propstat"]
+        }
+      ]
+    },
+    "propstat": {
+      "description": "Groups together a prop and status element that is associated with a particular href element",
+      "properties": {
+        "prop": {
+          "$ref": "prop"
+        },
+        "status": {
+          "$ref": "status"
+        },
+        "responsedescription": {
+          "$ref": "responsedescription"
+        }
+      },
+      "required": ["prop", "status"]
+    },
+    "status": {
+      "description": "Holds a single HTTP status-line",
+      "type": "string"
+    },
+    "responsedescription": {
+      "description": "Contains a message that can be displayed to the user explaining the nature of the response.",
+      "type": "string"
+    }
+  }
+}
