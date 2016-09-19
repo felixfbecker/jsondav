@@ -1,88 +1,236 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema",
   "definitions": {
+    "collection": {
+      "id": "collection",
+      "type": "boolean",
+      "enum": [
+        true
+      ],
+      "description": "Identifies the associated resource as a collection. The resourcetype property of a collection resource MUST have this value"
+    },
+    "link": {
+      "id": "link",
+      "type": "object",
+      "description": "Identifies the property as a link and contains the source and destination of that link.",
+      "properties": {
+        "src": {
+          "id": "src",
+          "type": "string",
+          "description": "Indicates the source of a link"
+        },
+        "dst": {
+          "id": "src",
+          "type": "string",
+          "description": "Indicates the destination of a link"
+        }
+      }
+    },
+    "href": {
+      "id": "href",
+      "type": "string",
+      "description": "Identifies the content of the element as a URI"
+    },
     "multistatus": {
+      "id": "multistatus",
+      "type": "object",
       "description": "Contains multiple response messages",
       "properties": {
         "response": {
           "type": "array",
           "items": {
-            "$ref": "response"
+            "id": "response",
+            "type": "object",
+            "description": "Holds a single response describing the effect of a method on resource and/or its properties",
+            "properties": {
+              "href": {
+                "type": "array",
+                "items": {
+                  "$ref": "href"
+                },
+                "minItems": 1
+              }
+            },
+            "oneOf": [
+              {
+                "properties": {
+                  "href": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "href"
+                    },
+                    "minItems": 1
+                  },
+                  "status": {
+                    "id": "status",
+                    "type": "string",
+                    "description": "Holds a single HTTP status-line"
+                  }
+                },
+                "required": [
+                  "href",
+                  "status"
+                ]
+              },
+              {
+                "properties": {
+                  "href": {
+                    "$ref": "href"
+                  },
+                  "propstat": {
+                    "type": "array",
+                    "items": {
+                      "id": "propstat",
+                      "type": "object",
+                      "description": "Groups together a prop and status element that is associated with a particular href element",
+                      "properties": {
+                        "prop": {
+                          "$ref": "prop"
+                        },
+                        "status": {
+                          "$ref": "status"
+                        },
+                        "responsedescription": {
+                          "$ref": "responsedescription"
+                        }
+                      },
+                      "required": [
+                        "prop",
+                        "status"
+                      ]
+                    },
+                    "minItems": 1
+                  }
+                },
+                "required": [
+                  "href",
+                  "propstat"
+                ]
+              }
+            ]
           },
           "minItems": 1
         },
         "responsedescription": {
-          "$ref": "responsedescription"
+          "id": "responsedescription",
+          "type": "string",
+          "description": "Contains a message that can be displayed to the user explaining the nature of the response."
         }
       },
-      "required": ["response"]
+      "required": [
+        "response"
+      ]
     },
-    "response": {
-      "description": "Holds a single response describing the effect of a method on resource and/or its properties",
-      "properties": {
-        "href": {
-          "type": "array",
-          "items": {
-            "$ref": "href"
-          },
-          "minItems": 1
-        }
-      },
+    "owner": {
+      "id": "owner",
+      "description": "Provides information about the principal taking out a lock"
+    },
+    "prop": {
+      "id": "prop",
+      "type": [
+        "object",
+        "array"
+      ],
+      "description": "Contains properties related to a resource"
+    },
+    "propertybehavior": {
+      "id": "propertybehavior",
+      "type": "object",
       "oneOf": [
         {
           "properties": {
-            "href": {
-              "type": "array",
-              "items": {
-                "$ref": "href"
-              },
-              "minItems": 1
-            },
-            "status": {
-              "$ref": "status"
+            "keepalive": {
+              "id": "keepalive",
+              "description": "Specifies requirements for the copying/moving of live properties",
+              "oneOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "$ref": "href"
+                  },
+                  "minItems": 1
+                }
+              ]
             }
           },
-          "required": ["href", "status"]
+          "required": ["keepalive"]
         },
         {
           "properties": {
-            "href": {
-              "$ref": "href"
-            },
-            "propstat": {
-              "type": "array",
-              "items": {
-                "$ref": "propstat"
-              },
-              "minItems": 1
+            "omit": {
+              "id": "omit",
+              "description": "The omit XML element instructs the server that it should use best effort to copy properties but a failure to copy a property MUST NOT cause the method to fail",
+              "type": "boolean",
+              "enum": [
+                true
+              ]
             }
           },
-          "required": ["href", "propstat"]
+          "required": ["omit"]
         }
       ]
     },
-    "propstat": {
-      "description": "Groups together a prop and status element that is associated with a particular href element",
-      "properties": {
-        "prop": {
-          "$ref": "prop"
-        },
-        "status": {
-          "$ref": "status"
-        },
-        "responsedescription": {
-          "$ref": "responsedescription"
+    "propertyupdate": {
+      "id": "propertyupdate",
+      "type": "object",
+      "oneOf": [
+        {
+          "properties": {
+            "remove": {
+              "id": "remove",
+              "description": "Lists the DAV properties to be removed from a resource",
+              "type": "array",
+              "items": {
+                "$ref": "prop"
+              }
+            }
+          }
         }
-      },
-      "required": ["prop", "status"]
+      ]
     },
-    "status": {
-      "description": "Holds a single HTTP status-line",
-      "type": "string"
-    },
-    "responsedescription": {
-      "description": "Contains a message that can be displayed to the user explaining the nature of the response.",
-      "type": "string"
+    "propfind": {
+      "id": "propfind",
+      "description": "Specifies the properties to be returned from a PROPFIND method.Two special elements are specified for use with propfind, allprop and propname. If prop is used inside propfind it MUST only contain property names, not values.",
+      "type": "object",
+      "oneOf": [
+        {
+          "properties": {
+            "allprop": {
+              "id": "allprop",
+              "type": "boolean",
+              "description": "The allprop element specifies that all property names and values on the resource are to be returned",
+              "enum": [
+                true
+              ]
+            }
+          },
+          "required": ["allprop"]
+        },
+        {
+          "id": "propname",
+          "type": "boolean",
+          "description": "The propname element specifies that only a list of property names on the resource is to be returned.",
+          "enum": [
+            true
+          ],
+          "required": ["propname"]
+        },
+        {
+          "properties": {
+            "prop": {
+              "$ref": "prop",
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "required": ["prop"]
+        }
+      ]
     }
   }
 }
